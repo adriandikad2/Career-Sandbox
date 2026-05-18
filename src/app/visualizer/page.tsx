@@ -138,7 +138,7 @@ export default function VisualizerPage() {
                   currentPath.status === 'rejected' ? 'bg-red-500/10 text-red-500' :
                   'bg-yellow-500/10 text-yellow-500'
                 }`}>
-                  HR {currentPath.status.replace('_', ' ')}
+                  HR {currentPath.status?.replace('_', ' ')}
                 </span>
               </div>
               <p className="text-xs text-text-secondary whitespace-pre-wrap">

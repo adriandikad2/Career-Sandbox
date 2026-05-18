@@ -36,7 +36,7 @@ export function HRReviewPanel() {
         <h3 className="text-sm font-semibold text-text-primary">HR Review</h3>
         {currentPath.status !== 'pending' && (
           <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-border-subtle text-text-secondary capitalize">
-            {currentPath.status.replace('_', ' ')}
+            {currentPath.status?.replace('_', ' ')}
           </span>
         )}
       </div>
