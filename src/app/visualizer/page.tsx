@@ -12,10 +12,13 @@ import { CareerCanvas } from '@/components/visualizer/career-canvas';
 import { ConfidenceSummaryPanel } from '@/components/visualizer/confidence-summary-panel';
 import { HighUncertaintyState } from '@/components/error-states/high-uncertainty';
 import { OfflineBanner } from '@/components/error-states/offline-fallback';
+import { HRReviewPanel } from '@/components/visualizer/hr-review-panel';
 
 export default function VisualizerPage() {
   const router = useRouter();
-  const { scenario, isGenerating, errorState } = useCareerStore();
+  const { scenario, isGenerating, errorState, userRole, activeSavedPathId, savedPaths } = useCareerStore();
+  const isHR = userRole === 'hr';
+  const currentPath = savedPaths.find((p) => p.id === activeSavedPathId);
 
   // Redirect if no scenario data
   useEffect(() => {
@@ -87,24 +90,28 @@ export default function VisualizerPage() {
       {/* Navigation bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle bg-bg-surface/50">
         <Link
-          href="/scenario"
+          href={isHR ? "/" : "/scenario"}
           className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
         >
           <ArrowLeft size={14} />
-          Edit Scenario
+          {isHR ? "Back to Dashboard" : "Edit Scenario"}
         </Link>
 
         <h1 className="text-sm font-semibold text-text-primary">
-          Career Path Visualizer
+          Career Path Visualizer {isHR && <span className="text-xs ml-2 text-accent px-2 py-0.5 bg-accent/10 rounded-full">HR Review Mode</span>}
         </h1>
 
-        <Link
-          href="/feedback"
-          className="inline-flex items-center gap-1.5 text-sm text-accent hover:text-accent-hover transition-colors font-medium"
-        >
-          Feedback & Save
-          <ArrowRight size={14} />
-        </Link>
+        {!isHR ? (
+          <Link
+            href="/feedback"
+            className="inline-flex items-center gap-1.5 text-sm text-accent hover:text-accent-hover transition-colors font-medium"
+          >
+            Feedback & Save
+            <ArrowRight size={14} />
+          </Link>
+        ) : (
+          <div className="w-[100px]"></div> /* Placeholder for alignment */
+        )}
       </div>
 
       {/* Canvas and Confidence Summary */}
@@ -120,8 +127,25 @@ export default function VisualizerPage() {
         </div>
 
         {/* Confidence Summary Sidebar */}
-        <div className="w-80 overflow-y-auto">
+        <div className="w-80 flex-shrink-0 overflow-y-auto flex flex-col pt-1">
           <ConfidenceSummaryPanel scenario={scenario} />
+          {isHR && <HRReviewPanel />}
+          {!isHR && currentPath && currentPath.status !== 'pending' && (
+            <div className="bg-bg-surface border border-border-subtle rounded-xl p-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${
+                  currentPath.status === 'approved' ? 'bg-green-500/10 text-green-500' :
+                  currentPath.status === 'rejected' ? 'bg-red-500/10 text-red-500' :
+                  'bg-yellow-500/10 text-yellow-500'
+                }`}>
+                  HR {currentPath.status.replace('_', ' ')}
+                </span>
+              </div>
+              <p className="text-xs text-text-secondary whitespace-pre-wrap">
+                {currentPath.hrFeedback || "No additional feedback provided."}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

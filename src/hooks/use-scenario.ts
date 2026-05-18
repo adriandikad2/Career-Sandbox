@@ -56,6 +56,8 @@ export function useScenario() {
             annotations,
             feedbackTags,
             timestamp: Date.now(),
+            formData,
+            scenario: scenario!,
           };
 
           // Process feedback and adjust parameters

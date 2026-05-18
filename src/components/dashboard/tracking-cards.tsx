@@ -1,7 +1,10 @@
 'use client';
 
-import { BookOpen, Wrench, Rocket, TrendingUp, Bookmark } from 'lucide-react';
+import { Bookmark, Check, X, TrendingUp, BookOpen, Wrench, Rocket } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCareerStore } from '@/store/career-store';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface TrackingCardProps {
   icon: React.ReactNode;
@@ -120,6 +123,16 @@ export function TrackingCards() {
 }
 
 export function SavedPathsPreview() {
+  const router = useRouter();
+  const { savedPaths, updatePathStatus, loadSavedPath, userRole } = useCareerStore();
+
+  const visiblePaths = savedPaths;
+
+  const handleViewDetails = (pathId: string) => {
+    loadSavedPath(pathId);
+    router.push('/visualizer');
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -127,13 +140,68 @@ export function SavedPathsPreview() {
       transition={{ duration: 0.5, delay: 0.4 }}
       className="glass-card p-6 mt-5"
     >
-      <div className="flex items-center gap-3 mb-4">
-        <Bookmark size={18} className="text-accent" />
-        <h3 className="text-base font-semibold text-text-primary">Saved Paths</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <Bookmark size={18} className="text-accent" />
+          <h3 className="text-base font-semibold text-text-primary">
+            Saved Career Paths {userRole === 'hr' ? '(HR Review)' : ''}
+          </h3>
+        </div>
       </div>
-      <p className="text-sm text-text-muted">
-        Belum ada jalur yang disimpan. Buat skenario baru untuk memulai.
-      </p>
+      
+      {visiblePaths.length === 0 ? (
+        <p className="text-sm text-text-muted">
+          Belum ada jalur yang disimpan. Buat skenario baru untuk memulai.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {visiblePaths.map((path) => (
+            <div key={path.id} className="p-4 rounded-xl border border-border-subtle bg-bg-surface/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-medium text-text-primary">
+                    Target: {path.formData.careerTarget || 'Not set'}
+                  </h4>
+                  {path.status === 'approved' && <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-xs font-medium border border-green-500/20">Approved</span>}
+                  {path.status === 'rejected' && <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-xs font-medium border border-red-500/20">Rejected</span>}
+                  {path.status === 'pending' && <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20">Pending</span>}
+                </div>
+                <p className="text-xs text-text-secondary">
+                  {new Date(path.timestamp).toLocaleDateString()} • {path.scenario.nodes.length} nodes
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleViewDetails(path.id)}
+                  className="px-3 py-1.5 text-sm rounded-lg bg-bg-elevated hover:bg-bg-elevated/80 text-text-primary transition-colors border border-border-subtle"
+                >
+                  View Details
+                </button>
+                
+                {userRole === 'hr' && path.status === 'pending' && (
+                  <div className="flex items-center gap-2 ml-2">
+                    <button
+                      onClick={() => updatePathStatus(path.id, 'approved')}
+                      className="p-1.5 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-500 transition-colors border border-green-500/20"
+                      title="Approve Path"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button
+                      onClick={() => updatePathStatus(path.id, 'rejected')}
+                      className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors border border-red-500/20"
+                      title="Reject Path"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }

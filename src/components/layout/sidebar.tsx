@@ -8,9 +8,10 @@ import {
   FileText,
   GitBranch,
   MessageSquare,
-  Settings,
-  User,
+  UserCircle,
+  Briefcase
 } from 'lucide-react';
+import { useCareerStore } from '@/store/career-store';
 
 const NAV_ITEMS = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard', id: 'nav-dashboard' },
@@ -19,14 +20,10 @@ const NAV_ITEMS = [
   { href: '/feedback', icon: MessageSquare, label: 'Feedback', id: 'nav-feedback' },
 ];
 
-const BOTTOM_ITEMS = [
-  { href: '#', icon: User, label: 'Profile', id: 'nav-profile' },
-  { href: '#', icon: Settings, label: 'Settings', id: 'nav-settings' },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
   useKeyboardNavigation();
+  const { userRole, setUserRole } = useCareerStore();
 
   return (
     <nav
@@ -84,20 +81,26 @@ export function Sidebar() {
 
       {/* Bottom nav */}
       <div className="flex flex-col gap-2 mt-auto">
-        {BOTTOM_ITEMS.map(({ href, icon: Icon, label, id }) => (
-          <Link
-            key={id}
-            href={href}
-            id={id}
-            aria-label={label}
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-all duration-200 group relative focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            <Icon size={20} strokeWidth={1.8} />
-            <span className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-bg-elevated text-text-primary text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg border border-border-subtle z-50">
-              {label}
-            </span>
-          </Link>
-        ))}
+        <button
+          onClick={() => setUserRole(userRole === 'employee' ? 'hr' : 'employee')}
+          className={`
+            relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200
+            group focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none
+            ${
+              userRole === 'hr'
+                ? 'bg-accent/20 text-accent'
+                : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
+            }
+          `}
+          aria-label={`Switch to ${userRole === 'employee' ? 'HR' : 'Employee'} mode`}
+          title={`Switch to ${userRole === 'employee' ? 'HR' : 'Employee'} mode`}
+        >
+          {userRole === 'employee' ? <UserCircle size={20} /> : <Briefcase size={20} />}
+          <span className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-bg-elevated text-text-primary text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg border border-border-subtle z-50">
+            <div>Role: {userRole === 'employee' ? 'Employee' : 'HR'}</div>
+            <div className="text-text-muted text-2xs">Click to switch</div>
+          </span>
+        </button>
       </div>
     </nav>
   );

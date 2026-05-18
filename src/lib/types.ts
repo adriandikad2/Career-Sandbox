@@ -88,12 +88,16 @@ export type FeedbackTag =
   | 'Unrealistic';
 
 export interface FeedbackContext {
+  timestamp: number;
+  formData: ScenarioFormData;
+  scenario: GeneratedScenario;
   annotations: string;
   feedbackTags: FeedbackTag[];
-  rejectedNodes?: string[]; // Node IDs user didn't like
-  selectedNodes?: string[]; // Node IDs user liked
-  timestamp: number;
+  status?: EvaluationStatus;
+  hrFeedback?: string;
 }
+
+export type EvaluationStatus = 'pending' | 'approved' | 'rejected' | 'needs_revision';
 
 export interface SavedPath {
   id: string;
@@ -102,6 +106,8 @@ export interface SavedPath {
   scenario: GeneratedScenario;
   annotations: string;
   feedbackTags: FeedbackTag[];
+  status?: EvaluationStatus;
+  hrFeedback?: string;
 }
 
 // ─── API ─────────────────────────────────────────────────

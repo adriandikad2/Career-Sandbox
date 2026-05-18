@@ -13,10 +13,7 @@ export function generateMockScenario(
     // Use AI Career Engine for intelligent path generation
     const scenario = AICareerEngine.generateScenario(
       formData,
-      feedbackContext ? {
-        rejectedNodes: feedbackContext.rejectedNodes,
-        selectedNodes: feedbackContext.selectedNodes,
-      } : undefined
+      undefined // We removed the userHistory mapping
     );
 
     return scenario;

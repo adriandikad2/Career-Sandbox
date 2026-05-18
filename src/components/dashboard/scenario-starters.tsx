@@ -1,10 +1,24 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Plus, ArrowRightLeft, Sparkles, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCareerStore } from '@/store/career-store';
 
 export function ScenarioStarters() {
+  const router = useRouter();
+  const { resetForm } = useCareerStore();
+
+  const handleStartBlank = () => {
+    resetForm();
+    router.push('/scenario');
+  };
+
+  const handleCareerSwitch = () => {
+    resetForm();
+    router.push('/scenario?template=career-switch');
+  };
+
   return (
     <section aria-label="Start new scenario" className="mt-10">
       <div className="flex items-center gap-3 mb-6">
@@ -19,10 +33,10 @@ export function ScenarioStarters() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Link
-            href="/scenario"
+          <button
+            onClick={handleStartBlank}
             id="start-blank"
-            className="glass-card p-8 block group hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
+            className="w-full text-left glass-card p-8 block group hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
           >
             {/* Glow effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -44,7 +58,7 @@ export function ScenarioStarters() {
                 <ChevronRight size={14} />
               </span>
             </div>
-          </Link>
+          </button>
         </motion.div>
 
         {/* Career Switch */}
@@ -53,10 +67,10 @@ export function ScenarioStarters() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Link
-            href="/scenario?template=career-switch"
+          <button
+            onClick={handleCareerSwitch}
             id="career-switch"
-            className="glass-card p-8 block group hover:border-[#00cec9]/40 transition-all duration-300 relative overflow-hidden"
+            className="w-full text-left glass-card p-8 block group hover:border-[#00cec9]/40 transition-all duration-300 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#00cec9]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -77,7 +91,7 @@ export function ScenarioStarters() {
                 <ChevronRight size={14} />
               </span>
             </div>
-          </Link>
+          </button>
         </motion.div>
       </div>
     </section>
