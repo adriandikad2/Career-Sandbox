@@ -36,6 +36,14 @@ export interface GeneratedScenario {
   overallConfidence: number;
 }
 
+export interface ReasoningExplanation {
+  primary: string; // Why this is recommended
+  dataSource: string; // Where did this recommendation come from
+  confidence: 'high' | 'medium' | 'low';
+  alternatives: string[]; // What else could be done
+  risks: string[]; // What could go wrong
+}
+
 export interface CareerNode {
   id: string;
   label: string;
@@ -45,6 +53,12 @@ export interface CareerNode {
   skills: string[];
   type: 'milestone' | 'certification' | 'role' | 'skill';
   reasoning: string; // "Kenapa AI merekomendasikan ini?"
+  detailedReasoning?: ReasoningExplanation;
+  skillGaps?: { skill: string; difficulty: 1 | 2 | 3 | 4 | 5; estimatedHours: number }[];
+  prerequisites?: string[]; // IDs of nodes that should come first
+  alternativePaths?: string[]; // IDs of alternative approaches
+  marketDemand?: 1 | 2 | 3 | 4 | 5; // How in-demand is this role/skill
+  historicalSuccessRate?: number; // % of people who succeed in this transition
   position: { x: number; y: number };
 }
 
@@ -73,6 +87,14 @@ export type FeedbackTag =
   | 'Meets Needs'
   | 'Unrealistic';
 
+export interface FeedbackContext {
+  annotations: string;
+  feedbackTags: FeedbackTag[];
+  rejectedNodes?: string[]; // Node IDs user didn't like
+  selectedNodes?: string[]; // Node IDs user liked
+  timestamp: number;
+}
+
 export interface SavedPath {
   id: string;
   timestamp: number;
@@ -86,6 +108,7 @@ export interface SavedPath {
 
 export interface GenerateRequest {
   formData: ScenarioFormData;
+  feedbackContext?: FeedbackContext;
 }
 
 export interface GenerateResponse {

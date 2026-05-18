@@ -6,7 +6,7 @@ import type { GenerateRequest, GenerateResponse } from '@/lib/types';
 export async function POST(request: NextRequest): Promise<NextResponse<GenerateResponse>> {
   try {
     const body: GenerateRequest = await request.json();
-    const { formData } = body;
+    const { formData, feedbackContext } = body;
 
     // ─── Validate input ────────────────────────────────
     const validation = validateScenarioForm(formData);
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateR
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // ─── Generate scenario ─────────────────────────────
-    const scenario = generateMockScenario(formData);
+    const scenario = generateMockScenario(formData, feedbackContext);
 
     // ─── Check for extreme uncertainty ─────────────────
     if (scenario.overallConfidence < 10) {

@@ -10,7 +10,7 @@ import { useScenario } from '@/hooks/use-scenario';
 
 export function ActionButtons() {
   const router = useRouter();
-  const { savePath, scenario } = useCareerStore();
+  const { savePath, scenario, annotations, feedbackTags } = useCareerStore();
   const { generate, isGenerating } = useScenario();
   const [saved, setSaved] = useState(false);
 
@@ -21,7 +21,9 @@ export function ActionButtons() {
   };
 
   const handleRegenerate = async () => {
-    await generate();
+    // Regenerate with feedback if any feedback was provided
+    const hasFeedback = annotations.trim().length > 0 || feedbackTags.length > 0;
+    await generate(hasFeedback);
     router.push('/visualizer');
   };
 
@@ -97,3 +99,4 @@ export function ActionButtons() {
     </div>
   );
 }
+

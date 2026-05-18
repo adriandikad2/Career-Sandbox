@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useKeyboardNavigation, getKeyboardShortcut } from '@/hooks/use-keyboard-navigation';
 import {
   LayoutDashboard,
   FileText,
@@ -25,6 +26,7 @@ const BOTTOM_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  useKeyboardNavigation();
 
   return (
     <nav
@@ -46,16 +48,17 @@ export function Sidebar() {
       <div className="flex flex-col gap-2 flex-1">
         {NAV_ITEMS.map(({ href, icon: Icon, label, id }) => {
           const isActive = pathname === href;
+          const shortcut = getKeyboardShortcut(href);
           return (
             <Link
               key={href}
               href={href}
               id={id}
-              aria-label={label}
+              aria-label={`${label}${shortcut ? ` (Ctrl+Shift+${shortcut.toUpperCase()})` : ''}`}
               aria-current={isActive ? 'page' : undefined}
               className={`
                 relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200
-                group
+                group focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none
                 ${isActive
                   ? 'bg-accent/20 text-accent'
                   : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
@@ -64,14 +67,15 @@ export function Sidebar() {
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
 
-              {/* Tooltip */}
+              {/* Tooltip with keyboard shortcut */}
               <span className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-bg-elevated text-text-primary text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg border border-border-subtle z-50">
-                {label}
+                <div>{label}</div>
+                {shortcut && <div className="text-text-muted text-2xs">Ctrl+Shift+{shortcut.toUpperCase()}</div>}
               </span>
 
               {/* Active indicator */}
               {isActive && (
-                <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-5 bg-accent rounded-r-full" />
+                <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-5 bg-accent rounded-r-full" aria-hidden="true" />
               )}
             </Link>
           );
@@ -86,7 +90,7 @@ export function Sidebar() {
             href={href}
             id={id}
             aria-label={label}
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-all duration-200 group relative"
+            className="w-11 h-11 rounded-xl flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-all duration-200 group relative focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <Icon size={20} strokeWidth={1.8} />
             <span className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-bg-elevated text-text-primary text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg border border-border-subtle z-50">

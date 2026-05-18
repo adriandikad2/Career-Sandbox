@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useCareerStore } from '@/store/career-store';
 import { TrustBanner } from '@/components/visualizer/trust-banner';
 import { CareerCanvas } from '@/components/visualizer/career-canvas';
+import { ConfidenceSummaryPanel } from '@/components/visualizer/confidence-summary-panel';
 import { HighUncertaintyState } from '@/components/error-states/high-uncertainty';
 import { OfflineBanner } from '@/components/error-states/offline-fallback';
 
@@ -77,7 +78,11 @@ export default function VisualizerPage() {
       className="h-screen flex flex-col"
     >
       {/* Trust / Offline Banner */}
-      {isOffline ? <OfflineBanner /> : <TrustBanner />}
+      {isOffline ? (
+        <OfflineBanner />
+      ) : (
+        <TrustBanner confidence={scenario.overallConfidence} />
+      )}
 
       {/* Navigation bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle bg-bg-surface/50">
@@ -102,14 +107,22 @@ export default function VisualizerPage() {
         </Link>
       </div>
 
-      {/* Canvas */}
-      <div className="flex-1">
-        <CareerCanvas
-          careerNodes={scenario.nodes}
-          careerEdges={scenario.edges}
-          tradeoffs={scenario.tradeoffs}
-          isOffline={isOffline}
-        />
+      {/* Canvas and Confidence Summary */}
+      <div className="flex-1 flex gap-4 p-4 overflow-hidden">
+        {/* Main Canvas */}
+        <div className="flex-1 min-w-0">
+          <CareerCanvas
+            careerNodes={scenario.nodes}
+            careerEdges={scenario.edges}
+            tradeoffs={scenario.tradeoffs}
+            isOffline={isOffline}
+          />
+        </div>
+
+        {/* Confidence Summary Sidebar */}
+        <div className="w-80 overflow-y-auto">
+          <ConfidenceSummaryPanel scenario={scenario} />
+        </div>
       </div>
     </motion.div>
   );
